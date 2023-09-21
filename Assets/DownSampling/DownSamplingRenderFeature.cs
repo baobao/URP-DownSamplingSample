@@ -3,7 +3,7 @@ using UnityEngine.Rendering.Universal;
 public class DownSamplingRenderFeature : ScriptableRendererFeature
 {
     public int downSample = 10;
-    
+
     DownSamplingRenderPass _renderPass;
 
     public override void Create()
@@ -16,7 +16,7 @@ public class DownSamplingRenderFeature : ScriptableRendererFeature
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
         // パスにカメラのカラーを渡す
-        _renderPass.SetParam(renderer.cameraColorTarget, downSample);
+        _renderPass.SetParam(downSample);
         renderer.EnqueuePass(_renderPass);
     }
 }
