@@ -6,9 +6,7 @@ public class DownSamplingRenderPass : ScriptableRenderPass
 {
     private const string CommandBufferName = nameof(DownSamplingRenderPass);
     private const int RenderTextureId = 0;
-    
-    private RenderTargetIdentifier _currentTarget;
-    
+
     private int _downSample = 1;
 
     /// ここでは、レンダリングロジックを実装することができます。
@@ -24,29 +22,28 @@ public class DownSamplingRenderPass : ScriptableRenderPass
         var h = cameraData.camera.scaledPixelHeight / _downSample;
 
         // RenderTextureを生成
-        commandBuffer.GetTemporaryRT(RenderTextureId, 
+        commandBuffer.GetTemporaryRT(RenderTextureId,
             w, h, 0, FilterMode.Point, RenderTextureFormat.Default);
-        
+
         // 現在のカメラ描画画像をRenderTextureにコピー
-        commandBuffer.Blit(_currentTarget, RenderTextureId);
-        
+        commandBuffer.Blit(renderingData.cameraData.renderer.cameraColorTargetHandle, RenderTextureId);
+
         // RenderTextureを現在のRenderTarget（カメラ）にコピー
-        commandBuffer.Blit(RenderTextureId, _currentTarget);
+        commandBuffer.Blit(RenderTextureId, renderingData.cameraData.renderer.cameraColorTargetHandle);
         context.ExecuteCommandBuffer(commandBuffer);
         context.Submit();
-        
+
         CommandBufferPool.Release(commandBuffer);
     }
-    
+
     /// <summary>Constructor</summary>
     public DownSamplingRenderPass() => renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
-    
+
     /// <summary>
     /// Execute実行前のパラメータを渡すメソッド
     /// </summary>
-    public void SetParam(RenderTargetIdentifier renderTarget, int downSample)
+    public void SetParam(int downSample)
     {
-        _currentTarget = renderTarget;
         _downSample = downSample;
         if (_downSample <= 0) _downSample = 1;
     }
